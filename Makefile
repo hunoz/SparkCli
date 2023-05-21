@@ -32,7 +32,7 @@ PoolRegionFlag = ${PKG}/cognito.PoolRegion=${SPARK_POOL_REGION}
 
 
 build:
-	GOOS=${GOOS} GOARCH=${GOARCH} go build -ldflags="-X ${ClientIdLdFlag} -X ${PoolIdLdFlag} -X ${PoolRegionFlag}" -o spark-${GOOS}-${GOARCH}
+	@GOOS=${GOOS} GOARCH=${GOARCH} go build -ldflags="-X ${ClientIdLdFlag} -X ${PoolIdLdFlag} -X ${PoolRegionFlag}" -o spark-${GOOS}-${GOARCH}
 
 run:
-	GOOS=${GOOS} GOARCH=${GOARCH} go run main.go -ldflags="-X ${ClientIdLdFlag} -X ${PoolIdLdFlag} ${PoolRegionFlag}"
+	@GOOS=${GOOS} GOARCH=${GOARCH} go run main.go -ldflags="-X ${ClientIdLdFlag} -X ${PoolIdLdFlag} ${PoolRegionFlag}"
