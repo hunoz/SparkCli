@@ -57,7 +57,7 @@ jobs:
 
         defaults:
             run:
-                shell: bash
+                shell: zsh
 
         strategy:
             matrix:
