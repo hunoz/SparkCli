@@ -45,7 +45,9 @@ jobs:
               with:
                 name: spark-version
                 path: spark-version.txt
+
     build:
+        needs: [get-version]
         name: "Build Spark Binaries"
         runs-on: "ubuntu-latest"
         env:
