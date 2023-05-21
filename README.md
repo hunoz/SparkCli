@@ -35,3 +35,6 @@ Register TOTP will register a TOTP device to you. This does not currently suppor
 Reset Password is for if you do not know your current password but have previously performed an initial sign in.
 1. Run `spark reset-password`
 2. Follow the prompts to reset your password
+
+## Roadmap
+* Add in an `init` subcommand that will place the pool ID, client ID, and region in the config, so that forking this repository isn't necessary and it can be used out of the box.
