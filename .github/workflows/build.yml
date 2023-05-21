@@ -1,0 +1,91 @@
+name: "Build Binary for MacOS, Linux, and Windows"
+
+on:
+    push:
+      branches: [ "main" ]  
+
+concurrency:
+    group: environment-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    id-token: write
+    contents: read
+
+jobs:
+    get-version:
+        name: "Get Spark Version"
+        runs-on: "ubuntu-latest"
+        env:
+            SPARK_CLIENT_ID: "ClientId"
+            SPARK_POOL_ID: "PoolId"
+            SPARK_POOL_REGION: "us-east-1"
+
+        defaults:
+            run:
+                shell: bash
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Set up Go
+              uses: actions/setup-go@v4
+              with:
+                go-version: '1.20.4'
+
+            - name: Build Spark CLI
+              run: go build -o spark
+
+            - name: Get Spark Version
+              run: echo "SPARK_VERSION=$(./spark --version)" > spark-version.txt
+
+            - name: Upload Spark Version Information
+              uses: actions/upload-artifact@v1
+              with:
+                name: spark-version
+                path: spark-version.txt
+    build:
+        name: "Build Spark Binaries"
+        runs-on: "ubuntu-latest"
+        env:
+            SPARK_CLIENT_ID: "ClientId"
+            SPARK_POOL_ID: "PoolId"
+            SPARK_POOL_REGION: "us-east-1"
+
+        defaults:
+            run:
+                shell: bash
+
+        strategy:
+            matrix:
+                os: [darwin, linux, windows]
+                arch: [arm, amd64]
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Set up Go
+              uses: actions/setup-go@v4
+              with:
+                go-version: '1.20.4'
+
+            - name: Build Spark CLI
+              run: GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} make build
+
+            - name: Download Spark Version Information
+              uses: actions/download-artifact@v1
+              with:
+                name: spark-version
+            
+            - name: Get Spark Version Information
+              id: get-spark-version
+              run: cat spark-version/spark-version.txt >> "$GITHUB_OUTPUT"
+
+            - name: Publish Binary to Releases
+              uses: svenstaro/upload-release-action@v2
+              with:
+                file: spark-${{ matrix.os }}-${{ matrix.arch }}
+                asset_name: spark-${{ matrix.os }}-${{ matrix.arch }}
+                tag: ${{ steps.get-spark-version.outputs.SPARK_VERSION }}
