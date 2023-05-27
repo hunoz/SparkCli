@@ -14,7 +14,7 @@ import (
 	"github.com/fatih/color"
 )
 
-var CmdVersion = "v1.0.4"
+var CmdVersion = "v1.0.5"
 
 type Release struct {
 	Url       string `json:"url,omitempty"`
@@ -29,7 +29,7 @@ type Error struct {
 
 func CmdIsLatestVersion() (string, bool) {
 	currentVersion := strings.Split(CmdVersion, "v")[1]
-	response, err := http.Get("https://api.github.com/repos/hunoz/SparkCli/releases/latest")
+	response, err := http.Get("https://api.github.com/repos/hunoz/spark/releases/latest")
 	if err != nil {
 		color.Red("Error fetching latest release: %v", err.Error())
 		os.Exit(1)
@@ -88,7 +88,7 @@ var UpdateCmd = &cobra.Command{
 
 		// Here we need to get the asset for the current architecture
 		assetFilename := fmt.Sprintf("spark-%v-%v", runtime.GOOS, runtime.GOARCH)
-		downloadUrl := fmt.Sprintf("https://github.com/hunoz/SparkCli/releases/download/%v/%v", latestVersion, assetFilename)
+		downloadUrl := fmt.Sprintf("https://github.com/hunoz/spark/releases/download/%v/%v", latestVersion, assetFilename)
 
 		response, err := http.Get(downloadUrl)
 		if err != nil {
