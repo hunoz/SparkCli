@@ -2,7 +2,11 @@ package cognito
 
 import (
 	"errors"
+	"os"
 	"regexp"
+
+	"github.com/fatih/color"
+	"github.com/manifoldco/promptui"
 )
 
 func CheckIfValidPassword(password string) error {
@@ -31,4 +35,30 @@ func CheckIfValidPassword(password string) error {
 		return errors.New("password must contain at least one special character")
 	}
 	return nil
+}
+
+func GetUsername() string {
+	usernamePrompt := promptui.Prompt{
+		Label: "Username",
+	}
+	username, err := usernamePrompt.Run()
+	if err != nil {
+		color.Red("Error: %v", err.Error())
+		os.Exit(1)
+	}
+	return username
+}
+
+func GetPassword() string {
+	passwordPrompt := promptui.Prompt{
+		Label:    "Password",
+		Mask:     '*',
+		Validate: CheckIfValidPassword,
+	}
+	password, err := passwordPrompt.Run()
+	if err != nil {
+		color.Red("Error: %v", err.Error())
+		os.Exit(1)
+	}
+	return password
 }

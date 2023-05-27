@@ -1,11 +1,10 @@
 package auth
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
-	"github.com/manifoldco/promptui"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gtech.dev/spark/cognito"
@@ -23,39 +22,21 @@ var AuthCmd = &cobra.Command{
 		config.CheckIfCognitoIsInitialized()
 		if config, e := config.GetCognitoConfig(); e != nil {
 			if strings.Contains(e.Error(), "Invalid region") {
-				fmt.Println("Spark has not been initialized. Please run 'spark init' to initialize Spark.")
+				color.Red("Spark has not been initialized. Please run 'spark init' to initialize Spark.")
 			} else {
-				fmt.Printf("Error getting config: %s\n", e.Error())
+				color.Red("Error getting config: %v", e.Error())
 			}
 			os.Exit(1)
 		} else {
 			configuration = config
 		}
-		passwordValidator := cognito.CheckIfValidPassword
-		usernamePrompt := promptui.Prompt{
-			Label: "Username",
-		}
-		username, err := usernamePrompt.Run()
-		if err != nil {
-			fmt.Printf("Error: %s\n", err)
-		}
-
-		passwordPrompt := promptui.Prompt{
-			Label:    "Password",
-			Mask:     '*',
-			Validate: passwordValidator,
-		}
-		password, err := passwordPrompt.Run()
-		if err != nil {
-			fmt.Printf("Error: %s\n", err)
-		}
 
 		cognitoClient := cognito.New(configuration)
 
-		cognitoClient.InitiateAuth(username, password, viper.GetBool(FlagKey.Force))
+		cognitoClient.InitiateAuth(viper.GetBool(FlagKey.Force))
 	},
 }
 
 func init() {
-	AuthCmd.Flags().Bool(FlagKey.Force, false, "Force update session, even if expiration time is > 6 hours")
+	AuthCmd.Flags().BoolP(FlagKey.Force, string(FlagKey.Force[0]), false, "Force update session, even if expiration time is > 6 hours")
 }

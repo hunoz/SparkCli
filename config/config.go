@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"golang.org/x/exp/slices"
 	"gtech.dev/spark/aws"
@@ -168,18 +169,25 @@ func CognitoIsInitialized() (*CognitoConfig, error) {
 
 func CheckIfCognitoIsInitialized() {
 	if _, err := CognitoIsInitialized(); err != nil {
-		fmt.Printf("%v\n", err.Error())
+		color.Red("%v", err.Error())
 		os.Exit(1)
 	}
 }
 
 func CognitoConfigIsValid(config *CognitoConfig) error {
-	if regions, err := aws.GetAwsRegions(); err != nil {
+	if err := IsValidAwsRegion(config.Region); err != nil {
 		return err
+	}
+	return nil
+}
+
+func IsValidAwsRegion(region string) error {
+	if regions, err := aws.GetAwsRegions(); err != nil {
+		return errors.Wrap(err, "Error fetching AWS regions")
 	} else {
-		if slices.Contains(regions, config.Region) {
+		if slices.Contains(regions, region) {
 			return nil
 		}
-		return errors.Errorf("Invalid region '%v'", config.Region)
+		return errors.New(fmt.Sprintf("Invalid region: '%v'", region))
 	}
 }

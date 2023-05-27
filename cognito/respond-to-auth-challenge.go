@@ -2,11 +2,11 @@ package cognito
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+	"github.com/fatih/color"
 )
 
 func respondToAuthChallenge(client cognitoidentityprovider.Client, input cognitoidentityprovider.RespondToAuthChallengeInput) cognitoidentityprovider.RespondToAuthChallengeOutput {
@@ -18,12 +18,12 @@ func respondToAuthChallenge(client cognitoidentityprovider.Client, input cognito
 		}
 
 		if strings.Contains(err.Error(), "Your software token has already been used once") {
-			fmt.Println("Your OTP has already been used before, please enter a different OTP")
+			color.Red("Your OTP has already been used before, please enter a different OTP")
 			otp := getOtp()
 			input.ChallengeResponses["SOFTWARE_TOKEN_MFA_CODE"] = otp
 			response, err = client.RespondToAuthChallenge(context.TODO(), &input)
 		} else {
-			fmt.Printf("Error responding to auth challenge: %v", err.Error())
+			color.Red("Error responding to auth challenge: %v", err.Error())
 			os.Exit(1)
 		}
 

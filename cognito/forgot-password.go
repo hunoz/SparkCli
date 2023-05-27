@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
+	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 	"gtech.dev/spark/config"
 )
@@ -19,7 +20,7 @@ func forgotPassword(client cognitoidentityprovider.Client, configuration *config
 		Username: &username,
 	})
 	if err != nil {
-		fmt.Printf("Error resetting password: %v\n", err.Error())
+		color.Red("Error resetting password: %v", err.Error())
 	}
 
 	confirmationCodePrompt := promptui.Prompt{
@@ -27,7 +28,7 @@ func forgotPassword(client cognitoidentityprovider.Client, configuration *config
 	}
 	confirmationCode, err := confirmationCodePrompt.Run()
 	if err != nil {
-		fmt.Printf("Error reading confirmation code: %v\n", err.Error())
+		color.Red("Error reading confirmation code: %v", err.Error())
 	}
 
 	passwordValidator := CheckIfValidPassword
@@ -39,7 +40,7 @@ func forgotPassword(client cognitoidentityprovider.Client, configuration *config
 	}
 	newPassword, err := passwordPrompt.Run()
 	if err != nil {
-		fmt.Printf("Error reading new password: %v\n", err.Error())
+		color.Red("Error reading new password: %v", err.Error())
 		os.Exit(1)
 	}
 
@@ -49,7 +50,7 @@ func forgotPassword(client cognitoidentityprovider.Client, configuration *config
 		Password:         aws.String(newPassword),
 		Username:         aws.String(username),
 	}); err != nil {
-		fmt.Printf("Error confirming new password: %v\n", err.Error())
+		color.Red("Error confirming new password: %v", err.Error())
 		os.Exit(1)
 	}
 
@@ -70,7 +71,7 @@ func forgotPassword(client cognitoidentityprovider.Client, configuration *config
 		},
 	})
 	if err != nil {
-		fmt.Printf("Error updating user attributes: %v\n", err.Error())
+		color.Red("Error updating user attributes: %v", err.Error())
 		os.Exit(1)
 	}
 

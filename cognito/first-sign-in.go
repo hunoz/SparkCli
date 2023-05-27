@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
+	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 	"gtech.dev/spark/config"
 )
@@ -19,7 +20,7 @@ func getEmailAttributeCode(client cognitoidentityprovider.Client, accessToken *s
 		AttributeName: aws.String("email"),
 	})
 	if err != nil {
-		fmt.Printf("Error getting email code: %v", err.Error())
+		color.Red("Error getting email code: %v", err.Error())
 		os.Exit(1)
 	}
 }
@@ -31,7 +32,7 @@ func verifyEmail(client cognitoidentityprovider.Client, accessToken *string, att
 		Code:          attributeCode,
 	})
 	if err != nil {
-		fmt.Printf("Error verifying email: %v", err.Error())
+		color.Red("Error verifying email: %v", err.Error())
 		os.Exit(1)
 	}
 }
@@ -44,7 +45,7 @@ func performFirstSignIn(client cognitoidentityprovider.Client, configuration *co
 	}
 	username, err := usernamePrompt.Run()
 	if err != nil {
-		fmt.Printf("Error reading username: %v\n", err.Error())
+		color.Red("Error reading username: %v", err.Error())
 	}
 
 	passwordPrompt := promptui.Prompt{
@@ -54,7 +55,7 @@ func performFirstSignIn(client cognitoidentityprovider.Client, configuration *co
 	}
 	temporaryPassword, err := passwordPrompt.Run()
 	if err != nil {
-		fmt.Printf("Error reading temporary password: %v\n", err.Error())
+		color.Red("Error reading temporary password: %v", err.Error())
 	}
 
 	passwordPrompt = promptui.Prompt{
@@ -64,7 +65,7 @@ func performFirstSignIn(client cognitoidentityprovider.Client, configuration *co
 	}
 	newPassword, err := passwordPrompt.Run()
 	if err != nil {
-		fmt.Printf("Error reading new password: %v\n", err.Error())
+		color.Red("Error reading new password: %v", err.Error())
 		os.Exit(1)
 	}
 
@@ -93,10 +94,10 @@ func performFirstSignIn(client cognitoidentityprovider.Client, configuration *co
 	initiateAuth(client, configuration, username, newPassword, true)
 
 	if config, e := config.GetCognitoConfig(); e != nil {
-		fmt.Printf("Error getting config: %s\n", e.Error())
+		color.Red("Error getting config: %v", e.Error())
 		os.Exit(1)
 	} else {
-		fmt.Println("Performing email verification")
+		color.Cyan("Performing email verification")
 		getEmailAttributeCode(client, &config.AccessToken)
 
 		tokenPrompt := promptui.Prompt{
@@ -104,7 +105,7 @@ func performFirstSignIn(client cognitoidentityprovider.Client, configuration *co
 		}
 		token, err := tokenPrompt.Run()
 		if err != nil {
-			fmt.Printf("Error reading new password: %v\n", err.Error())
+			color.Red("Error reading new password: %v", err.Error())
 			os.Exit(1)
 		}
 

@@ -1,9 +1,9 @@
 package init
 
 import (
-	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -18,9 +18,11 @@ func getClientIdFromAllOptions() string {
 			Label: "Client ID",
 		}
 		clientId, _ = clientIdPrompt.Run()
+	} else {
+		clientId = clientIdFromCli
 	}
 	if clientId == "" {
-		fmt.Println("Client ID cannot be empty")
+		color.Red("Client ID cannot be empty")
 		os.Exit(1)
 	}
 	return clientId
@@ -31,13 +33,18 @@ func getRegionFromAllOptions() string {
 	regionFromCli := viper.GetString(FlagKey.Region)
 	if regionFromCli == "" {
 		regionPrompt := promptui.Prompt{
-			Label: "Region",
+			Label:    "Region",
+			Validate: config.IsValidAwsRegion,
 		}
 		region, _ = regionPrompt.Run()
+	} else {
+		region = regionFromCli
 	}
 	if region == "" {
-		fmt.Println("Region cannot be empty")
+		color.Red("Region cannot be empty")
 		os.Exit(1)
+	} else if err := config.IsValidAwsRegion(region); err != nil {
+		color.Red(err.Error())
 	}
 	return region
 }
@@ -50,9 +57,11 @@ func getPoolIdFromAllOptions() string {
 			Label: "Pool ID",
 		}
 		poolId, _ = poolIdPrompt.Run()
+	} else {
+		poolId = poolIdFromCli
 	}
 	if poolId == "" {
-		fmt.Println("Pool ID cannot be empty")
+		color.Red("Pool ID cannot be empty")
 		os.Exit(1)
 	}
 	return poolId
@@ -79,7 +88,7 @@ var InitCmd = &cobra.Command{
 				Region:   region,
 				PoolId:   poolId,
 			}); err != nil {
-				fmt.Printf("Error updating config: %v\n", err.Error())
+				color.Red("Error updating config: %v", err.Error())
 				os.Exit(1)
 			}
 		} else {
@@ -92,21 +101,21 @@ var InitCmd = &cobra.Command{
 				poolId = getPoolIdFromAllOptions()
 			} else {
 				if configuration.ClientId != "" && !overwrite {
-					fmt.Println("Client ID already configured")
+					color.Cyan("Client ID already configured")
 					clientId = configuration.ClientId
 				} else if configuration.ClientId == "" {
 					clientId = getClientIdFromAllOptions()
 				}
 
 				if configuration.Region != "" && !overwrite {
-					fmt.Println("Region already configured")
+					color.Cyan("Region already configured")
 					region = configuration.Region
 				} else if configuration.Region == "" {
 					region = getRegionFromAllOptions()
 				}
 
 				if configuration.PoolId != "" && !overwrite {
-					fmt.Println("Pool ID already configured")
+					color.Cyan("Pool ID already configured")
 					poolId = configuration.PoolId
 				} else if configuration.PoolId == "" {
 					poolId = getPoolIdFromAllOptions()
@@ -122,7 +131,7 @@ var InitCmd = &cobra.Command{
 				Session:     configuration.Session,
 				Expires:     configuration.Expires,
 			}); err != nil {
-				fmt.Printf("Error updating config: %v\n", err.Error())
+				color.Red("Error updating config: %v", err.Error())
 				os.Exit(1)
 			}
 		}

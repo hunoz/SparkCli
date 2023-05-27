@@ -1,11 +1,11 @@
 package cognito
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 	"gtech.dev/spark/config"
 )
@@ -25,8 +25,8 @@ func New(configuration *config.CognitoConfig) CognitoClient {
 	}
 }
 
-func (c *CognitoClient) InitiateAuth(username string, password string, force bool) {
-	initiateAuth(*c.Client, c.Config, username, password, force)
+func (c *CognitoClient) InitiateAuth(force bool) {
+	initiateAuth(*c.Client, c.Config, "", "", force)
 }
 
 func (c *CognitoClient) ChangePassword() {
@@ -35,7 +35,7 @@ func (c *CognitoClient) ChangePassword() {
 
 func (c *CognitoClient) RegisterMfaDevice() {
 	if config, e := config.GetCognitoConfig(); e != nil {
-		fmt.Printf("Error getting config: %s\n", e.Error())
+		color.Red("Error getting config: %v", e.Error())
 		os.Exit(1)
 	} else {
 		registerTotp(*c.Client, config.Session)
@@ -49,7 +49,7 @@ func (c *CognitoClient) ResetPassword() {
 	}
 	username, err := usernamePrompt.Run()
 	if err != nil {
-		fmt.Printf("Error reading new password: %v\n", err.Error())
+		color.Red("Error reading new password: %v", err.Error())
 	}
 	forgotPassword(*c.Client, c.Config, username)
 }

@@ -1,9 +1,9 @@
 package registertotp
 
 import (
-	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"gtech.dev/spark/cognito"
 	"gtech.dev/spark/config"
@@ -17,7 +17,7 @@ var RegisterTotpCmd = &cobra.Command{
 		var configuration *config.CognitoConfig
 		config.CheckIfCognitoIsInitialized()
 		if config, e := config.GetCognitoConfig(); e != nil {
-			fmt.Printf("Error getting config: %s\n", e.Error())
+			color.Red("Error getting config: %v", e.Error())
 			os.Exit(1)
 		} else {
 			configuration = config

@@ -10,9 +10,8 @@ import (
 	cmdInit "gtech.dev/spark/cmd/init"
 	registertotp "gtech.dev/spark/cmd/register-totp"
 	resetpassword "gtech.dev/spark/cmd/reset-password"
+	"gtech.dev/spark/cmd/update"
 )
-
-var cmdVersion = "1.0.1"
 
 var RootCmd = &cobra.Command{
 	Use:   "spark",
@@ -24,7 +23,7 @@ var RootCmd = &cobra.Command{
 		}
 
 		if version {
-			fmt.Println(cmdVersion)
+			fmt.Println(update.CmdVersion)
 		} else {
 			cmd.Help()
 		}
@@ -32,11 +31,12 @@ var RootCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.Flags().Bool("version", false, "Current version of Spark")
+	RootCmd.Flags().BoolP("version", "v", false, "Current version of Spark")
 	RootCmd.AddCommand(auth.AuthCmd)
 	RootCmd.AddCommand(changepassword.ChangePasswordCmd)
 	RootCmd.AddCommand(registertotp.RegisterTotpCmd)
 	RootCmd.AddCommand(resetpassword.ResetPasswordCmd)
 	RootCmd.AddCommand(firstsignin.FirstSignInCmd)
 	RootCmd.AddCommand(cmdInit.InitCmd)
+	RootCmd.AddCommand(update.UpdateCmd)
 }

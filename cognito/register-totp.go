@@ -2,11 +2,11 @@ package cognito
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 )
 
@@ -16,7 +16,7 @@ func getOtp() string {
 	}
 	otp, err := otpPrompt.Run()
 	if err != nil {
-		fmt.Printf("Error reading OTP: %s", err)
+		color.Red("Error reading OTP: %v", err.Error())
 		os.Exit(1)
 	}
 
@@ -26,7 +26,7 @@ func getOtp() string {
 func verifyTotp(client cognitoidentityprovider.Client, input cognitoidentityprovider.VerifySoftwareTokenInput) {
 	_, err := client.VerifySoftwareToken(context.TODO(), &input)
 	if err != nil {
-		fmt.Printf("Error verifying token: %v\n", err.Error())
+		color.Red("Error verifying token: %v", err.Error())
 		os.Exit(1)
 	}
 }
@@ -36,11 +36,11 @@ func registerTotp(client cognitoidentityprovider.Client, session string) {
 		Session: &session,
 	})
 	if err != nil {
-		fmt.Printf("Error registering Totp: %v\n", err.Error())
+		color.Red("Error registering Totp: %v", err.Error())
 		os.Exit(1)
 	}
 
-	fmt.Printf("TOTP Verification code: %v\n", *response.SecretCode)
+	color.Cyan("Please use the following code code to register your TOTP device: %v", response.SecretCode)
 	otp := getOtp()
 
 	verifyTotp(client, cognitoidentityprovider.VerifySoftwareTokenInput{

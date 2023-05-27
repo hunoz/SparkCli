@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
+	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 	"gtech.dev/spark/config"
 )
@@ -23,7 +24,7 @@ func changePassword(client cognitoidentityprovider.Client, configuration *config
 	}
 	oldPassword, err := passwordPrompt.Run()
 	if err != nil {
-		fmt.Printf("Error reading old password: %v\n", err.Error())
+		color.Red("Error reading old password: %v", err.Error())
 	}
 
 	passwordPrompt = promptui.Prompt{
@@ -33,7 +34,7 @@ func changePassword(client cognitoidentityprovider.Client, configuration *config
 	}
 	newPassword, err := passwordPrompt.Run()
 	if err != nil {
-		fmt.Printf("Error reading new password: %v\n", err.Error())
+		color.Red("Error reading new password: %v", err.Error())
 		os.Exit(1)
 	}
 	response, err = client.ChangePassword(context.TODO(), &cognitoidentityprovider.ChangePasswordInput{
@@ -42,7 +43,7 @@ func changePassword(client cognitoidentityprovider.Client, configuration *config
 		ProposedPassword: aws.String(newPassword),
 	})
 	if err != nil {
-		fmt.Printf("Error changing password: %v", err.Error())
+		color.Red("Error changing password: %v", err.Error())
 		os.Exit(1)
 	}
 
@@ -56,7 +57,7 @@ func changePassword(client cognitoidentityprovider.Client, configuration *config
 		},
 	})
 	if err != nil {
-		fmt.Printf("Error updating user attributes: %v\n", err.Error())
+		color.Red("Error updating user attributes: %v", err.Error())
 	}
 	return response
 }
