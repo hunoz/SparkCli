@@ -1,4 +1,4 @@
-module gtech.dev/spark
+module github.com/hunoz/spark
 
 go 1.20
 

@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 
 	"github.com/fatih/color"
+	"github.com/hunoz/spark/aws"
+	"github.com/hunoz/spark/homedir"
 	"github.com/pkg/errors"
 	"golang.org/x/exp/slices"
-	"gtech.dev/spark/aws"
-	"gtech.dev/spark/homedir"
 )
 
 type CognitoConfig struct {

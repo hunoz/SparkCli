@@ -4,10 +4,10 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/hunoz/spark/config"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gtech.dev/spark/config"
 )
 
 func getClientIdFromAllOptions() string {

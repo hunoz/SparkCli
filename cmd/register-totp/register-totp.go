@@ -4,9 +4,9 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/hunoz/spark/cognito"
+	"github.com/hunoz/spark/config"
 	"github.com/spf13/cobra"
-	"gtech.dev/spark/cognito"
-	"gtech.dev/spark/config"
 )
 
 var RegisterTotpCmd = &cobra.Command{

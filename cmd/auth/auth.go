@@ -5,10 +5,10 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/hunoz/spark/cognito"
+	"github.com/hunoz/spark/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gtech.dev/spark/cognito"
-	"gtech.dev/spark/config"
 )
 
 var AuthCmd = &cobra.Command{

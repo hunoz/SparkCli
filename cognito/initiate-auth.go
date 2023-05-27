@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 	"github.com/fatih/color"
-	"gtech.dev/spark/config"
+	"github.com/hunoz/spark/config"
 )
 
 func callCognitoInitiateAuth(client cognitoidentityprovider.Client, input cognitoidentityprovider.InitiateAuthInput, firstLogin bool) *cognitoidentityprovider.InitiateAuthOutput {

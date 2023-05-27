@@ -3,14 +3,14 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/hunoz/spark/cmd/auth"
+	changepassword "github.com/hunoz/spark/cmd/change-password"
+	firstsignin "github.com/hunoz/spark/cmd/first-sign-in"
+	cmdInit "github.com/hunoz/spark/cmd/init"
+	registertotp "github.com/hunoz/spark/cmd/register-totp"
+	resetpassword "github.com/hunoz/spark/cmd/reset-password"
+	"github.com/hunoz/spark/cmd/update"
 	"github.com/spf13/cobra"
-	"gtech.dev/spark/cmd/auth"
-	changepassword "gtech.dev/spark/cmd/change-password"
-	firstsignin "gtech.dev/spark/cmd/first-sign-in"
-	cmdInit "gtech.dev/spark/cmd/init"
-	registertotp "gtech.dev/spark/cmd/register-totp"
-	resetpassword "gtech.dev/spark/cmd/reset-password"
-	"gtech.dev/spark/cmd/update"
 )
 
 var RootCmd = &cobra.Command{

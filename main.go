@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gtech.dev/spark/cmd"
+	"github.com/hunoz/spark/cmd"
 )
 
 func main() {

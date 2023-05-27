@@ -13,7 +13,7 @@ import (
 	"github.com/fatih/color"
 )
 
-var CmdVersion = "1.0.2"
+var CmdVersion = "1.0.3"
 
 type Release struct {
 	Url       string `json:"url,omitempty"`

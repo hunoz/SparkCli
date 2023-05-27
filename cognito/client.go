@@ -6,8 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/fatih/color"
+	"github.com/hunoz/spark/config"
 	"github.com/manifoldco/promptui"
-	"gtech.dev/spark/config"
 )
 
 type CognitoClient struct {

@@ -16,4 +16,4 @@ build:
 	@GOOS=${GOOS} GOARCH=${GOARCH} go build -o spark-${GOOS}-${GOARCH}
 
 run:
-	@GOOS=${GOOS} GOARCH=${GOARCH} go run main.go
+	@GOOS=${GOOS} GOARCH=${GOARCH} go run main.go $(ARGS)
