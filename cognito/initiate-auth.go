@@ -39,10 +39,10 @@ func callCognitoInitiateAuth(client cognitoidentityprovider.Client, input cognit
 	return response
 }
 
-func initiateAuth(client cognitoidentityprovider.Client, username string, password string, force bool) {
+func initiateAuth(client cognitoidentityprovider.Client, configuration *config.CognitoConfig, username string, password string, force bool) {
 	now := time.Now()
 	if config, err := config.GetCognitoConfig(); err != nil {
-		fmt.Printf("Error getting current session: %s\n", err)
+		fmt.Printf("Error getting config: %s\n", err)
 		os.Exit(1)
 	} else {
 		// Don't update if the token is valid for 6 hours or greater
@@ -59,7 +59,7 @@ func initiateAuth(client cognitoidentityprovider.Client, username string, passwo
 			"USERNAME": username,
 			"PASSWORD": password,
 		},
-		ClientId: aws.String(ClientId),
+		ClientId: aws.String(configuration.ClientId),
 	}
 
 	response := callCognitoInitiateAuth(client, input, false)
@@ -72,7 +72,7 @@ func initiateAuth(client cognitoidentityprovider.Client, username string, passwo
 		switch response.ChallengeName {
 		case types.ChallengeNameTypeNewPasswordRequired:
 			fmt.Println("New password required, initiating password reset")
-			newPassword := forgotPassword(client, username)
+			newPassword := forgotPassword(client, configuration, username)
 			input.AuthParameters["PASSWORD"] = newPassword
 			response = callCognitoInitiateAuth(client, input, false)
 		case types.ChallengeNameTypeMfaSetup:
@@ -88,7 +88,7 @@ func initiateAuth(client cognitoidentityprovider.Client, username string, passwo
 					"USERNAME":                username,
 					"SOFTWARE_TOKEN_MFA_CODE": *aws.String(otp),
 				},
-				ClientId: &ClientId,
+				ClientId: &configuration.ClientId,
 				Session:  response.Session,
 			})
 			response = &cognitoidentityprovider.InitiateAuthOutput{
@@ -110,6 +110,9 @@ func initiateAuth(client cognitoidentityprovider.Client, username string, passwo
 	}
 
 	cognitoConfig := config.CognitoConfig{
+		ClientId:    configuration.ClientId,
+		Region:      configuration.Region,
+		PoolId:      configuration.PoolId,
 		AccessToken: *response.AuthenticationResult.AccessToken,
 		IdToken:     *response.AuthenticationResult.IdToken,
 		Expires:     now.Add(time.Second * time.Duration(response.AuthenticationResult.ExpiresIn)).Unix(),

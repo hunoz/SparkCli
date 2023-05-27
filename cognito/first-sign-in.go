@@ -36,7 +36,7 @@ func verifyEmail(client cognitoidentityprovider.Client, accessToken *string, att
 	}
 }
 
-func performFirstSignIn(client cognitoidentityprovider.Client) {
+func performFirstSignIn(client cognitoidentityprovider.Client, configuration *config.CognitoConfig) {
 	passwordValidator := CheckIfValidPassword
 
 	usernamePrompt := promptui.Prompt{
@@ -74,13 +74,13 @@ func performFirstSignIn(client cognitoidentityprovider.Client) {
 			"USERNAME": username,
 			"PASSWORD": temporaryPassword,
 		},
-		ClientId: aws.String(ClientId),
+		ClientId: aws.String(configuration.ClientId),
 	}
 
 	session := callCognitoInitiateAuth(client, input, true).Session
 
 	respondToAuthChallenge(client, cognitoidentityprovider.RespondToAuthChallengeInput{
-		ClientId:      &ClientId,
+		ClientId:      &configuration.ClientId,
 		ChallengeName: types.ChallengeNameTypeNewPasswordRequired,
 		ChallengeResponses: map[string]string{
 			"USERNAME":     username,
@@ -90,10 +90,10 @@ func performFirstSignIn(client cognitoidentityprovider.Client) {
 		Session: session,
 	})
 
-	initiateAuth(client, username, newPassword, true)
+	initiateAuth(client, configuration, username, newPassword, true)
 
 	if config, e := config.GetCognitoConfig(); e != nil {
-		fmt.Printf("Error getting current session: %s\n", e.Error())
+		fmt.Printf("Error getting config: %s\n", e.Error())
 		os.Exit(1)
 	} else {
 		fmt.Println("Performing email verification")

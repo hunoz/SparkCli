@@ -2,11 +2,14 @@ package auth
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gtech.dev/spark/cognito"
+	"gtech.dev/spark/config"
 )
 
 var AuthCmd = &cobra.Command{
@@ -16,6 +19,18 @@ var AuthCmd = &cobra.Command{
 		viper.BindPFlag(FlagKey.Force, cmd.Flags().Lookup(FlagKey.Force))
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		var configuration *config.CognitoConfig
+		config.CheckIfCognitoIsInitialized()
+		if config, e := config.GetCognitoConfig(); e != nil {
+			if strings.Contains(e.Error(), "Invalid region") {
+				fmt.Println("Spark has not been initialized. Please run 'spark init' to initialize Spark.")
+			} else {
+				fmt.Printf("Error getting config: %s\n", e.Error())
+			}
+			os.Exit(1)
+		} else {
+			configuration = config
+		}
 		passwordValidator := cognito.CheckIfValidPassword
 		usernamePrompt := promptui.Prompt{
 			Label: "Username",
@@ -35,7 +50,7 @@ var AuthCmd = &cobra.Command{
 			fmt.Printf("Error: %s\n", err)
 		}
 
-		cognitoClient := cognito.New()
+		cognitoClient := cognito.New(configuration)
 
 		cognitoClient.InitiateAuth(username, password, viper.GetBool(FlagKey.Force))
 	},

@@ -2,15 +2,20 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	"golang.org/x/exp/slices"
+	"gtech.dev/spark/aws"
 	"gtech.dev/spark/homedir"
 )
 
 type CognitoConfig struct {
 	Region      string `json:",omitempty" type:"string"`
+	ClientId    string `json:",omitempty" type:"string"`
+	PoolId      string `json:",omitempty" type:"string"`
 	AccessToken string `json:",omitempty" type:"string"`
 	IdToken     string `json:",omitempty" type:"string"`
 	Expires     int64  `json:",omitempty" type:"integer"`
@@ -120,17 +125,21 @@ func GetCognitoConfig() (*CognitoConfig, error) {
 		return nil, errors.Wrap(err, "Could not read Spark session config")
 	}
 
+	if err := CognitoConfigIsValid(&config.Cognito); err != nil {
+		return nil, err
+	}
+
 	return &config.Cognito, nil
 }
 
 // UpdateCognitoConfig takes a session as an argument and adds it to the spark session config file
-func UpdateCognitoConfig(newSession CognitoConfig) error {
+func UpdateCognitoConfig(newConfig CognitoConfig) error {
 	config, err := readSparkConfig()
 	if err != nil {
 		return errors.Wrap(err, "Could not read Spark session config")
 	}
 
-	config.Cognito = newSession
+	config.Cognito = newConfig
 
 	err = writeSparkConfig(config)
 	if err != nil {
@@ -138,4 +147,39 @@ func UpdateCognitoConfig(newSession CognitoConfig) error {
 	}
 
 	return nil
+}
+
+func CognitoIsInitialized() (*CognitoConfig, error) {
+	config, err := readSparkConfig()
+	if err != nil {
+		return nil, errors.Wrap(err, "Could not read Spark session config")
+	}
+
+	if config.Cognito.AccessToken != "" || config.Cognito.Expires == 0 || config.Cognito.IdToken != "" {
+		return &config.Cognito, nil
+	}
+
+	if config.Cognito.ClientId == "" || config.Cognito.Region == "" || config.Cognito.PoolId == "" {
+		return nil, errors.New("Spark has not been initialized. Please run 'spark init' to initialize Spark.")
+	}
+
+	return &config.Cognito, nil
+}
+
+func CheckIfCognitoIsInitialized() {
+	if _, err := CognitoIsInitialized(); err != nil {
+		fmt.Printf("%v\n", err.Error())
+		os.Exit(1)
+	}
+}
+
+func CognitoConfigIsValid(config *CognitoConfig) error {
+	if regions, err := aws.GetAwsRegions(); err != nil {
+		return err
+	} else {
+		if slices.Contains(regions, config.Region) {
+			return nil
+		}
+		return errors.Errorf("Invalid region '%v'", config.Region)
+	}
 }

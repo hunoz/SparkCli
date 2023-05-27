@@ -10,11 +10,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 	"github.com/manifoldco/promptui"
+	"gtech.dev/spark/config"
 )
 
-func forgotPassword(client cognitoidentityprovider.Client, username string) string {
+func forgotPassword(client cognitoidentityprovider.Client, configuration *config.CognitoConfig, username string) string {
 	_, err := client.ForgotPassword(context.TODO(), &cognitoidentityprovider.ForgotPasswordInput{
-		ClientId: &ClientId,
+		ClientId: &configuration.ClientId,
 		Username: &username,
 	})
 	if err != nil {
@@ -43,7 +44,7 @@ func forgotPassword(client cognitoidentityprovider.Client, username string) stri
 	}
 
 	if _, err := client.ConfirmForgotPassword(context.TODO(), &cognitoidentityprovider.ConfirmForgotPasswordInput{
-		ClientId:         &ClientId,
+		ClientId:         &configuration.ClientId,
 		ConfirmationCode: aws.String(confirmationCode),
 		Password:         aws.String(newPassword),
 		Username:         aws.String(username),
@@ -59,7 +60,7 @@ func forgotPassword(client cognitoidentityprovider.Client, username string) stri
 				"USERNAME": username,
 				"PASSWORD": newPassword,
 			},
-			ClientId: aws.String(ClientId),
+			ClientId: aws.String(configuration.ClientId),
 		}, false).AuthenticationResult.AccessToken,
 		UserAttributes: []types.AttributeType{
 			{

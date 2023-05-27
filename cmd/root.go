@@ -7,11 +7,12 @@ import (
 	"gtech.dev/spark/cmd/auth"
 	changepassword "gtech.dev/spark/cmd/change-password"
 	firstsignin "gtech.dev/spark/cmd/first-sign-in"
+	cmdInit "gtech.dev/spark/cmd/init"
 	registertotp "gtech.dev/spark/cmd/register-totp"
 	resetpassword "gtech.dev/spark/cmd/reset-password"
 )
 
-var cmdVersion = "1.0.0"
+var cmdVersion = "1.0.1"
 
 var RootCmd = &cobra.Command{
 	Use:   "spark",
@@ -37,4 +38,5 @@ func init() {
 	RootCmd.AddCommand(registertotp.RegisterTotpCmd)
 	RootCmd.AddCommand(resetpassword.ResetPasswordCmd)
 	RootCmd.AddCommand(firstsignin.FirstSignInCmd)
+	RootCmd.AddCommand(cmdInit.InitCmd)
 }

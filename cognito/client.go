@@ -11,32 +11,34 @@ import (
 )
 
 type CognitoClient struct {
-	Client cognitoidentityprovider.Client
+	Client *cognitoidentityprovider.Client
+	Config *config.CognitoConfig
 }
 
-func New() CognitoClient {
+func New(configuration *config.CognitoConfig) CognitoClient {
 	cognitoIdpClient := cognitoidentityprovider.New(cognitoidentityprovider.Options{
-		Region: *aws.String(PoolRegion),
+		Region: *aws.String(configuration.Region),
 	})
 	return CognitoClient{
-		Client: *cognitoIdpClient,
+		Client: cognitoIdpClient,
+		Config: configuration,
 	}
 }
 
 func (c *CognitoClient) InitiateAuth(username string, password string, force bool) {
-	initiateAuth(c.Client, username, password, force)
+	initiateAuth(*c.Client, c.Config, username, password, force)
 }
 
 func (c *CognitoClient) ChangePassword() {
-	changePassword(c.Client)
+	changePassword(*c.Client, c.Config)
 }
 
 func (c *CognitoClient) RegisterMfaDevice() {
 	if config, e := config.GetCognitoConfig(); e != nil {
-		fmt.Printf("Error getting current session: %s\n", e.Error())
+		fmt.Printf("Error getting config: %s\n", e.Error())
 		os.Exit(1)
 	} else {
-		registerTotp(c.Client, config.Session)
+		registerTotp(*c.Client, config.Session)
 	}
 }
 
@@ -49,9 +51,9 @@ func (c *CognitoClient) ResetPassword() {
 	if err != nil {
 		fmt.Printf("Error reading new password: %v\n", err.Error())
 	}
-	forgotPassword(c.Client, username)
+	forgotPassword(*c.Client, c.Config, username)
 }
 
 func (c *CognitoClient) PerformFirstSignIn() {
-	performFirstSignIn(c.Client)
+	performFirstSignIn(*c.Client, c.Config)
 }

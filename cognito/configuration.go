@@ -5,10 +5,6 @@ import (
 	"regexp"
 )
 
-var ClientId string
-var PoolId string
-var PoolRegion string
-
 func CheckIfValidPassword(password string) error {
 	// Password must be 8 characters or greater
 	if len(password) < 8 {

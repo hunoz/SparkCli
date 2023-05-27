@@ -35,4 +35,5 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.33 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.27 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
+	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 )
