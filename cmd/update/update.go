@@ -14,7 +14,7 @@ import (
 	"github.com/fatih/color"
 )
 
-var CmdVersion = "v1.0.3"
+var CmdVersion = "v1.0.4"
 
 type Release struct {
 	Url       string `json:"url,omitempty"`
@@ -23,7 +23,11 @@ type Release struct {
 	TagName   string `json:"tag_name,omitempty"`
 }
 
-func CmdIsLatestVersion() (*string, bool) {
+type Error struct {
+	Message string `json:"message,omitempty"`
+}
+
+func CmdIsLatestVersion() (string, bool) {
 	currentVersion := strings.Split(CmdVersion, "v")[1]
 	response, err := http.Get("https://api.github.com/repos/hunoz/SparkCli/releases/latest")
 	if err != nil {
@@ -45,13 +49,24 @@ func CmdIsLatestVersion() (*string, bool) {
 		os.Exit(1)
 	}
 
+	if response.StatusCode != 200 {
+		e := Error{}
+		err := json.Unmarshal(body, &e)
+		if err != nil {
+			color.Red("Error reading error message while fetching latest version: %v", err.Error())
+			os.Exit(1)
+		}
+		color.Red("Error fetching latest release: %v", e.Message)
+		os.Exit(1)
+	}
+
 	latestVersion := strings.Split(release.TagName, "v")[1]
 
 	if latestVersion == currentVersion || latestVersion < currentVersion {
-		return &latestVersion, true
+		return release.TagName, true
 	}
 
-	return &latestVersion, false
+	return release.TagName, false
 }
 
 var UpdateCmd = &cobra.Command{
