@@ -29,6 +29,10 @@ func (c *CognitoClient) InitiateAuth(force bool) {
 	initiateAuth(*c.Client, c.Config, "", "", force)
 }
 
+func (c *CognitoClient) RefreshTokens() {
+	refreshTokens(*c.Client, c.Config)
+}
+
 func (c *CognitoClient) ChangePassword() {
 	changePassword(*c.Client, c.Config)
 }

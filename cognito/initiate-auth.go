@@ -25,6 +25,9 @@ func callCognitoInitiateAuth(client cognitoidentityprovider.Client, input cognit
 				AuthenticationResult: nil,
 				ChallengeName:        types.ChallengeNameTypeNewPasswordRequired,
 			}
+			// If the token has been revoked, a new auth needs to be run
+		} else if strings.Contains(err.Error(), "Refresh Token has been revoked") {
+			color.Red("Refresh token has been revoked, please run 'spark auth' to get a new refresh token")
 		} else {
 			color.Red("Error authenticating to Cognito: %v", err.Error())
 		}
@@ -41,16 +44,11 @@ func callCognitoInitiateAuth(client cognitoidentityprovider.Client, input cognit
 
 func initiateAuth(client cognitoidentityprovider.Client, configuration *config.CognitoConfig, username string, password string, force bool) {
 	now := time.Now()
-	if config, err := config.GetCognitoConfig(); err != nil {
-		color.Red("Error getting config: %v", err.Error())
-		os.Exit(1)
-	} else {
-		// Don't update if the token is valid for 6 hours or greater
-		timeLeft := time.Until(time.Unix(config.Expires, 0))
-		if timeLeft.Hours() >= 6 && !force {
-			color.Cyan("Token is still valid for %v hours, not updating", int(timeLeft.Hours()))
-			os.Exit(0)
-		}
+	// Don't update if the token is valid for 6 hours or greater
+	timeLeft := time.Until(time.Unix(configuration.Expires, 0))
+	if timeLeft.Hours() >= 6 && !force {
+		color.Cyan("Token is still valid for %v hours, not updating", int(timeLeft.Hours()))
+		os.Exit(0)
 	}
 
 	if username == "" {
@@ -118,13 +116,15 @@ func initiateAuth(client cognitoidentityprovider.Client, configuration *config.C
 	}
 
 	cognitoConfig := config.CognitoConfig{
-		ClientId:    configuration.ClientId,
-		Region:      configuration.Region,
-		PoolId:      configuration.PoolId,
-		AccessToken: *response.AuthenticationResult.AccessToken,
-		IdToken:     *response.AuthenticationResult.IdToken,
-		Expires:     now.Add(time.Second * time.Duration(response.AuthenticationResult.ExpiresIn)).Unix(),
-		Session:     userSession,
+		ClientId:           configuration.ClientId,
+		Region:             configuration.Region,
+		PoolId:             configuration.PoolId,
+		AccessToken:        *response.AuthenticationResult.AccessToken,
+		IdToken:            *response.AuthenticationResult.IdToken,
+		RefreshToken:       *response.AuthenticationResult.RefreshToken,
+		RefreshTokenExpiry: now.Add(time.Hour * time.Duration(int32(720))).Unix(),
+		Expires:            now.Add(time.Second * time.Duration(response.AuthenticationResult.ExpiresIn)).Unix(),
+		Session:            userSession,
 	}
 
 	if err := config.UpdateCognitoConfig(cognitoConfig); err != nil {
