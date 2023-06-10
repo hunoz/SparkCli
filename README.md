@@ -17,6 +17,10 @@ Init is used to first set up the CLI or to update the client ID, pool ID, and/or
 1. Run `spark init` (or `spark init --overwrite` if you need to update any of the client ID, pool ID and/or region)
 2. Follow the promps as necessary (or utilize the flags that can be specified via the CLI)
 
+### Update
+Update is used to update the CLI to the latest version
+1. Run `spark update`
+
 ### First Sign In
 First Sign In is used if you have been added or created in a Cognito pool but have not performed a first sign in to verify your email and change your password.
 1. Run `spark first-sign-in`
@@ -42,5 +46,8 @@ Reset Password is for if you do not know your current password but have previous
 1. Run `spark reset-password`
 2. Follow the prompts to reset your password
 
+### Refresh Tokens
+Refresh Tokens is for refreshing your access and ID tokens without re-authenticating. This assumes the Cognito default of 30 day expiry for the client.
+1. Run `spark refresh`
+
 ## Roadmap
-* Add `update` subcommand to allow updating from the CLI

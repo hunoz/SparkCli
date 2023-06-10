@@ -14,13 +14,15 @@ import (
 )
 
 type CognitoConfig struct {
-	Region      string `json:",omitempty" type:"string"`
-	ClientId    string `json:",omitempty" type:"string"`
-	PoolId      string `json:",omitempty" type:"string"`
-	AccessToken string `json:",omitempty" type:"string"`
-	IdToken     string `json:",omitempty" type:"string"`
-	Expires     int64  `json:",omitempty" type:"integer"`
-	Session     string `json:",omitempty" type:"string"`
+	Region             string `json:",omitempty" type:"string"`
+	ClientId           string `json:",omitempty" type:"string"`
+	PoolId             string `json:",omitempty" type:"string"`
+	AccessToken        string `json:",omitempty" type:"string"`
+	IdToken            string `json:",omitempty" type:"string"`
+	RefreshToken       string `json:",omitempty" type:"string"`
+	RefreshTokenExpiry int64  `json:",omitempty" type:"integer"`
+	Expires            int64  `json:",omitempty" type:"integer"`
+	Session            string `json:",omitempty" type:"string"`
 }
 
 type Config struct {
